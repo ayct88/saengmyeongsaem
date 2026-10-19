@@ -23,10 +23,8 @@ h3{font-size:1.5rem;font-weight:700;margin:.2em 0}
 .topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 28px;transition:background .25s,box-shadow .25s;background:linear-gradient(rgba(6,22,44,.45),transparent)}
 .topbar.solid{background:#fff;box-shadow:0 2px 14px rgba(12,40,74,.12)}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff}
-.logo{display:block;height:38px;width:auto;border-radius:6px;box-shadow:0 1px 6px rgba(4,20,45,.25)}
-.topbar.solid .logo{box-shadow:0 0 0 1px rgba(12,40,74,.08)}
-.brand-txt{display:flex;flex-direction:column;line-height:1.2}
-.brand-txt small{font-size:.8rem;font-weight:600;opacity:.92;letter-spacing:.06em}
+.logo{display:block;height:34px;max-height:34px;width:auto;max-width:44vw;filter:drop-shadow(0 1px 4px rgba(4,20,45,.35))}
+.topbar.solid .logo{filter:none}
 nav{display:flex;align-items:center;gap:2px;flex-wrap:wrap}
 nav a{text-decoration:none;color:#fff;font-weight:600;font-size:1.05rem;padding:8px 12px;border-radius:8px}
 nav a.pill{background:var(--lime);color:var(--navy);font-weight:700;border-radius:999px;padding:8px 20px;margin-left:8px}
@@ -126,7 +124,7 @@ table.worship{width:100%;border-collapse:separate;border-spacing:0;background:#f
 .btn.big{font-size:1.2rem;padding:16px 32px}
 .email{font-size:1.5rem;font-weight:700;margin:.6em 0 1em;word-break:break-all}
 
-.flogo{display:block;height:34px;width:auto;margin:0 auto 14px;border-radius:5px}
+.flogo{display:block;height:30px;max-height:30px;width:auto;margin:0 auto 14px}
 .footer{background:var(--navy);border-top:4px solid var(--lime);color:#dbe5f1;text-align:center;padding:44px 24px;font-size:1rem}
 .footer a{color:#fff}.footer p{margin:.3em 0}.footer .small{color:#a9bbd1}
 .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:#111;color:#fff;padding:14px 22px;border-radius:12px;font-size:1.05rem;opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:90vw;text-align:center}
@@ -145,7 +143,7 @@ table.worship{width:100%;border-collapse:separate;border-spacing:0;background:#f
 @media (max-width:640px){
  body{font-size:19px}
  .topbar{padding:10px 16px}
- .logo{height:30px}.brand-txt{display:none}
+ .logo{height:28px;max-height:28px}
  .section{padding:72px 18px 64px}
  h2{font-size:1.9rem}
  .wm{top:28px}
