@@ -58,7 +58,7 @@ background:radial-gradient(ellipse at 72% 30%,rgba(255,236,190,.55),transparent 
 .btn.ghost{border-color:#fff;color:#fff;background:rgba(255,255,255,.08)}
 .btn.ghost.dark{border-color:var(--navy);color:var(--navy);background:#fff}
 .band .btn.ghost.dark{border-color:#fff;color:#fff;background:transparent}
-.btn.naver{background:#03a94d;color:#fff}.btn.kakao{background:#fee500;color:#191600}
+.btn.naver{background:#03a94d;color:#fff}.btn.kakao{background:#fee500;color:#191600}.btn.google{background:#fff;color:#1f1f1f;border:1px solid #dadce0}
 .btn:focus-visible,nav a:focus-visible,.quick a:focus-visible,.panel:focus-visible{outline:3px solid #f5b400;outline-offset:3px}
 
 /* 퀵링크 카드 (히어로 하단에 겹침) */
@@ -114,6 +114,7 @@ table.worship{width:100%;border-collapse:separate;border-spacing:0;background:#f
 .infobox span{color:var(--lime-on-dark);font-weight:700;font-size:1rem}.infobox strong{font-size:1.4rem;color:#fff}
 
 .address{position:relative;text-align:center;font-size:1.3rem;line-height:1.7}
+.address .addr-sub{font-size:.85em;color:#555}.walk{text-align:center;font-size:1.05rem;color:#444;margin:.2em 0 0}
 .map-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:1em 0 1.6em}
 .mapframe{position:relative;height:420px;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:#e8edf3}
 
