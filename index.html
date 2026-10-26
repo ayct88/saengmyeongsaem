@@ -25,8 +25,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500&amp;display=swap&amp;text=%ED%99%98%EC%98%81%ED%95%98%EA%B3%A0%20%EC%B6%95%EB%B3%B5%ED%95%A9%EB%8B%88%EB%8B%A4">
-<link rel="stylesheet" href="style.css?v=6">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600&amp;display=swap&amp;text=%ED%99%98%EC%98%81%ED%95%98%EA%B3%A0%20%EC%B6%95%EB%B3%B5%ED%95%A9%EB%8B%88%EB%8B%A4">
+<link rel="stylesheet" href="style.css?v=7">
 <link rel="canonical" href="https://ayct88.github.io/saengmyeongsaem/">
 <script type="application/ld+json">
 {
@@ -118,7 +118,10 @@
       <button type="button" role="tab" id="hero-tab-2" aria-selected="false" tabindex="-1" aria-label="2번째 배너, 예배"></button>
       <button type="button" role="tab" id="hero-tab-3" aria-selected="false" tabindex="-1" aria-label="3번째 배너, 영혼구원"></button>
     </div>
-    <button class="hero-pause" type="button" aria-pressed="false">일시정지</button>
+    <button class="hero-pause" type="button" aria-pressed="false" aria-label="일시정지">
+      <svg class="icon-pause" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M7 5h3.2v14H7zM13.8 5H17v14h-3.2z" fill="currentColor"/></svg>
+      <svg class="icon-play" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M8 5.2v13.6l11.2-6.8z" fill="currentColor"/></svg>
+    </button>
   </div>
 </section>
 
@@ -128,15 +131,21 @@
     <h2>예배시간</h2>
     <p class="lede">토요일과 주일에 함께 예배드립니다. 처음 오시는 분도 편하게 함께하실 수 있습니다.</p>
     <div class="schedule">
-      <h3 class="day">토요일</h3>
-      <div class="time-row"><b>오전 7시</b><span>0부 예배</span></div>
-      <h3 class="day">주일</h3>
-      <div class="time-row"><b>오전 7시</b><span>1부 예배</span></div>
-      <div class="time-row"><b>오전 9시</b><span>2부 예배</span></div>
-      <div class="time-row"><b>오후 1시</b><span>3부 예배</span></div>
-      <div class="time-row"><b>오후 3시</b><span>신유치유 집회/기도회</span></div>
-      <h3 class="day">수요일 · 금요일</h3>
-      <div class="time-row"><b>가정예배</b><span>각 가정에서 드립니다</span></div>
+      <section class="day-block">
+        <h3 class="day">토요일</h3>
+        <div class="time-row"><b>오전 7시</b><span>0부 예배</span></div>
+      </section>
+      <section class="day-block">
+        <h3 class="day">주일</h3>
+        <div class="time-row"><b>오전 7시</b><span>1부 예배</span></div>
+        <div class="time-row"><b>오전 9시</b><span>2부 예배</span></div>
+        <div class="time-row"><b>오후 1시</b><span>3부 예배</span></div>
+        <div class="time-row"><b>오후 3시</b><span>신유치유 집회/기도회</span></div>
+      </section>
+      <section class="day-block">
+        <h3 class="day">수요일 · 금요일</h3>
+        <div class="time-row"><b>가정예배</b><span>각 가정에서 드립니다</span></div>
+      </section>
     </div>
     <p class="note">수요 예배와 금요 예배는 지금 교회에서 모이지 않고, 가정예배로 드립니다.</p>
   </div>
@@ -284,6 +293,6 @@
   <p class="small">“하나님 영광을 위해 살자”</p>
 </footer>
 <div class="toast" role="status" aria-live="polite"></div>
-<script src="main.js?v=6"></script>
+<script src="main.js?v=7"></script>
 </body>
 </html>

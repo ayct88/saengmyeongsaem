@@ -120,11 +120,33 @@ document.documentElement.classList.add('js');
     pauseBtn.addEventListener('click', function () {
       paused = !paused;
       pauseBtn.setAttribute('aria-pressed', paused ? 'true' : 'false');
-      pauseBtn.textContent = paused ? '다시 재생' : '일시정지';
+      pauseBtn.setAttribute('aria-label', paused ? '재생' : '일시정지');
       if (paused) stop();
       else start();
     });
   }
+  var touchX = 0;
+  var touchY = 0;
+  var swiping = false;
+  root.addEventListener('touchstart', function (e) {
+    if (e.touches.length !== 1 || e.target.closest('a, button')) {
+      swiping = false;
+      return;
+    }
+    touchX = e.touches[0].clientX;
+    touchY = e.touches[0].clientY;
+    swiping = true;
+  }, { passive: true });
+  root.addEventListener('touchend', function (e) {
+    if (!swiping || !e.changedTouches.length) return;
+    swiping = false;
+    var t = e.changedTouches[0];
+    var dx = t.clientX - touchX;
+    var dy = t.clientY - touchY;
+    if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy)) return;
+    show(dx < 0 ? index + 1 : index - 1);
+    start();
+  }, { passive: true });
   root.addEventListener('mouseenter', function () { hovering = true; stop(); });
   root.addEventListener('mouseleave', function () { hovering = false; start(); });
   root.addEventListener('focusin', function () { hovering = true; stop(); });
