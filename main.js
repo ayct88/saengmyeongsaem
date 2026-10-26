@@ -191,17 +191,11 @@ document.documentElement.classList.add('js');
     return String(b.published_kst || b.date_kst || '').localeCompare(String(a.published_kst || a.date_kst || ''));
   }
   function curate(items) {
-    var list = (items || []).filter(function (item) { return !isShort(item); });
+    var list = (items || []).filter(function (item) { return item && item.title && !isShort(item); });
     var pinned = list.filter(function (item) { return item.pinned === true; });
     var pool = pinned.length ? pinned : list;
-    var featured = null;
-    pool.forEach(function (item) {
-      if (item.category !== 'sermon') return;
-      if (!featured || byViews(featured, item) > 0) featured = item;
-    });
     var groups = {};
     pool.forEach(function (item) {
-      if (featured && item.id === featured.id) return;
       var key = item.category || 'sermon';
       if (!groups[key]) groups[key] = [];
       groups[key].push(item);
@@ -209,16 +203,17 @@ document.documentElement.classList.add('js');
     var chosen = [];
     ORDER.forEach(function (key) {
       var rows = (groups[key] || []).slice().sort(byViews);
-      var limit = PER[key] || 2;
-      if (key === 'sermon' && featured) limit = Math.max(0, limit - 1);
-      chosen = chosen.concat(rows.slice(0, limit));
+      chosen = chosen.concat(rows.slice(0, PER[key] || 2));
     });
-    return { featured: featured, items: chosen };
+    return chosen;
   }
   function card(item, labels) {
     var meta = [item.kind, item.scripture ? '본문 ' + item.scripture : '', item.preacher].filter(Boolean).join(' · ');
+    var thumb = item.thumb
+      ? '<span class="thumb"><img loading="eager" src="' + esc(item.thumb) + '" alt="" width="480" height="360"><i class="play" aria-hidden="true"></i></span>'
+      : '';
     return '<article class="vcard" data-cat="' + esc(item.category) + '" data-id="' + esc(item.id) + '"><a href="' + esc(item.url) + '" target="_blank" rel="noopener">' +
-      '<span class="thumb' + (item.is_short ? ' short' : '') + '"><img loading="lazy" src="' + esc(item.thumb) + '" alt="" width="480" height="360"><i class="play" aria-hidden="true"></i></span>' +
+      thumb +
       '<span class="vbody"><span class="vcat c-' + esc(item.category) + '">' + esc(labels[item.category] || '') + '</span><b class="vtitle">' + esc(item.title) + '</b>' +
       (meta ? '<span class="vmeta">' + esc(meta) + '</span>' : '') +
       '<span class="vdate">' + esc(String(item.date_kst || '').replace(/-/g, '.')) + '</span>' +
@@ -235,22 +230,6 @@ document.documentElement.classList.add('js');
     var empty = document.getElementById('vempty');
     if (empty) empty.hidden = any;
   }
-  function setFeatured(item) {
-    if (!item || !item.id) return;
-    var frame = document.getElementById('feature-frame');
-    var link = document.getElementById('feature-link');
-    var title = document.getElementById('feature-title');
-    var meta = document.getElementById('feature-meta');
-    var bits = [item.scripture ? '본문 ' + item.scripture : '', item.preacher || '', item.date_kst ? String(item.date_kst).replace(/-/g, '.') : ''].filter(Boolean);
-    if (frame && String(frame.getAttribute('src') || '').indexOf(item.id) === -1) {
-      frame.src = 'https://www.youtube-nocookie.com/embed/' + item.id + '?rel=0';
-    }
-    if (frame) frame.title = '대표 설교: ' + item.title + (bits.length ? ', ' + bits.join(', ') : '');
-    if (link) link.href = item.url || ('https://www.youtube.com/watch?v=' + item.id);
-    if (title) title.textContent = item.title || '';
-    if (meta) meta.textContent = bits.length ? ' · ' + bits.join(' · ') : '';
-  }
-
   document.querySelectorAll('.fbtn').forEach(function (button) {
     button.addEventListener('click', function () {
       current = button.getAttribute('data-f') || 'all';
@@ -272,8 +251,7 @@ document.documentElement.classList.add('js');
     var labels = {};
     (data.categories || []).forEach(function (cat) { labels[cat.id] = cat.label; });
     var picked = curate(data.items);
-    setFeatured(picked.featured);
-    if (picked.items.length) grid.innerHTML = picked.items.map(function (item) { return card(item, labels); }).join('');
+    if (picked.length) grid.innerHTML = picked.map(function (item) { return card(item, labels); }).join('');
     if (data.notices && data.notices.length) {
       var notices = document.getElementById('notices');
       if (notices) {
