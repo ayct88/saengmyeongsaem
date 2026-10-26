@@ -1,51 +1,290 @@
-(function(){
-  var btn=document.querySelector('.menu-btn'),nav=document.getElementById('nav');
-  btn.addEventListener('click',function(){var o=nav.classList.toggle('open');btn.setAttribute('aria-expanded',o);});
-  nav.addEventListener('click',function(e){if(e.target.tagName==='A'){nav.classList.remove('open');btn.setAttribute('aria-expanded','false');}});
-  var toast=document.querySelector('.toast'),t;
-  function show(m){toast.textContent=m;toast.classList.add('on');clearTimeout(t);t=setTimeout(function(){toast.classList.remove('on')},2500);}
-  function fallback(s){var a=document.createElement('textarea');a.value=s;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();try{document.execCommand('copy');show('복사되었습니다');}catch(e){show(s);}document.body.removeChild(a);}
-  document.querySelectorAll('.copy').forEach(function(b){b.addEventListener('click',function(){
-    var s=b.getAttribute('data-copy');
-    if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(s).then(function(){show('복사되었습니다: '+s)},function(){fallback(s)});}else fallback(s);
-  });});
-})();
-(function(){
-  var ps=document.querySelectorAll('.panel');
-  ps.forEach(function(p){p.addEventListener('click',function(){ps.forEach(function(q){q.classList.remove('on')});p.classList.add('on');});});
-  var tb=document.getElementById('topbar');
-  function f(){tb.classList.toggle('solid',window.scrollY>40);} window.addEventListener('scroll',f,{passive:true}); f();
-})();
-/* 교회소식·설교 아카이브: data/board.json 을 읽어 다시 그림(실패하면 HTML 안의 정적 카드 그대로 사용) */
-(function(){
-  var grid=document.getElementById('vgrid'); if(!grid) return;
-  var cur='all';
-  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-  function apply(){grid.querySelectorAll('.vcard').forEach(function(c){c.hidden=!(cur==='all'||c.getAttribute('data-cat')===cur);});}
-  document.querySelectorAll('.fbtn').forEach(function(b){b.addEventListener('click',function(){
-    cur=b.getAttribute('data-f');
-    document.querySelectorAll('.fbtn').forEach(function(x){var on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-pressed',on);});
-    apply();
-  });});
-  if(!window.fetch||location.protocol==='file:') return;
-  fetch('data/board.json',{cache:'no-cache'}).then(function(r){if(!r.ok) throw 0; return r.json();}).then(function(d){
-    if(!d||!d.items||!d.items.length) return;
-    var lab={}; (d.categories||[]).forEach(function(c){lab[c.id]=c.label;});
-    grid.innerHTML=d.items.map(function(it){
-      var meta=[it.kind,it.scripture?'본문 '+it.scripture:'',it.preacher].filter(Boolean).join(' · ');
-      return '<article class="vcard" data-cat="'+esc(it.category)+'"><a href="'+esc(it.url)+'" target="_blank" rel="noopener">'+
-        '<span class="thumb'+(it.is_short?' short':'')+'"><img loading="lazy" src="'+esc(it.thumb)+'" alt="" width="480" height="360"><i class="play" aria-hidden="true"></i></span>'+
-        '<span class="vbody"><span class="vcat c-'+esc(it.category)+'">'+esc(lab[it.category]||'')+'</span><b class="vtitle">'+esc(it.title)+'</b>'+
-        (meta?'<span class="vmeta">'+esc(meta)+'</span>':'')+'<span class="vdate">'+esc((it.date_kst||'').replace(/-/g,'.'))+'</span>'+
-        (it.summary?'<span class="vsum">'+esc(it.summary)+'</span>':'')+'</span></a></article>';
-    }).join('');
-    if(d.notices&&d.notices.length){
-      document.getElementById('notices').innerHTML=d.notices.map(function(n){
-        var foot=[n.date?n.date.replace(/-/g,'.'):'',n.link?'<a href="'+esc(n.link)+'" target="_blank" rel="noopener">자세히 보기 →</a>':''].filter(Boolean).join(' · ');
-        return '<article class="notice"><span class="ntag">'+esc(n.tag||'소식')+'</span><h3>'+esc(n.title)+'</h3><p>'+esc(n.body)+'</p>'+(foot?'<p class="ndate">'+foot+'</p>':'')+'</article>';
-      }).join('');
+document.documentElement.classList.add('js');
+
+(function () {
+  var btn = document.querySelector('.menu-btn');
+  var nav = document.getElementById('nav');
+  if (btn && nav) {
+    function closeMenu() {
+      nav.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
     }
-    var u=document.getElementById('board-upd'); if(u&&d.updated_kst) u.textContent='(목록 갱신: '+d.updated_kst.slice(0,10).replace(/-/g,'.')+')';
+    btn.addEventListener('click', function () {
+      var open = nav.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    nav.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A') closeMenu();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeMenu();
+    });
+    document.addEventListener('click', function (e) {
+      if (!nav.classList.contains('open')) return;
+      if (nav.contains(e.target) || btn.contains(e.target)) return;
+      closeMenu();
+    });
+  }
+
+  var toast = document.querySelector('.toast');
+  var toastTimer;
+  function show(message) {
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add('on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.classList.remove('on'); }, 2500);
+  }
+  function fallbackCopy(value) {
+    var area = document.createElement('textarea');
+    area.value = value;
+    area.setAttribute('readonly', '');
+    area.style.position = 'fixed';
+    area.style.opacity = '0';
+    document.body.appendChild(area);
+    area.select();
+    try {
+      document.execCommand('copy');
+      show('복사되었습니다');
+    } catch (err) {
+      show(value);
+    }
+    document.body.removeChild(area);
+  }
+  document.querySelectorAll('.copy').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var value = button.getAttribute('data-copy') || '';
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(value).then(function () {
+          show('복사되었습니다: ' + value);
+        }, function () { fallbackCopy(value); });
+      } else {
+        fallbackCopy(value);
+      }
+    });
+  });
+
+  var topbar = document.getElementById('topbar');
+  if (topbar) {
+    var onScroll = function () { topbar.classList.toggle('is-scrolled', window.scrollY > 8); };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+})();
+
+(function () {
+  var root = document.querySelector('.hero');
+  if (!root) return;
+  var slides = Array.prototype.slice.call(root.querySelectorAll('.slide'));
+  var dots = Array.prototype.slice.call(root.querySelectorAll('.hero-dots button'));
+  var prev = root.querySelector('.prev');
+  var next = root.querySelector('.next');
+  var pauseBtn = root.querySelector('.hero-pause');
+  if (!slides.length || !prev || !next) return;
+  var index = 0;
+  var timer = null;
+  var paused = false;
+  var hovering = false;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var delay = 7000;
+
+  function show(n) {
+    index = (n + slides.length) % slides.length;
+    slides.forEach(function (slide, i) {
+      var on = i === index;
+      slide.classList.toggle('is-active', on);
+      slide.setAttribute('aria-hidden', on ? 'false' : 'true');
+      if (on) slide.removeAttribute('inert');
+      else slide.setAttribute('inert', '');
+    });
+    dots.forEach(function (dot, i) {
+      var on = i === index;
+      dot.setAttribute('aria-selected', on ? 'true' : 'false');
+      dot.tabIndex = on ? 0 : -1;
+    });
+  }
+  function stop() {
+    clearInterval(timer);
+    timer = null;
+  }
+  function start() {
+    if (paused || hovering || reduce || slides.length < 2) return;
+    stop();
+    timer = setInterval(function () { show(index + 1); }, delay);
+  }
+  prev.addEventListener('click', function () { show(index - 1); start(); });
+  next.addEventListener('click', function () { show(index + 1); start(); });
+  dots.forEach(function (dot, i) {
+    dot.addEventListener('click', function () { show(i); start(); });
+  });
+  if (pauseBtn) {
+    pauseBtn.addEventListener('click', function () {
+      paused = !paused;
+      pauseBtn.setAttribute('aria-pressed', paused ? 'true' : 'false');
+      pauseBtn.textContent = paused ? '다시 재생' : '일시정지';
+      if (paused) stop();
+      else start();
+    });
+  }
+  root.addEventListener('mouseenter', function () { hovering = true; stop(); });
+  root.addEventListener('mouseleave', function () { hovering = false; start(); });
+  root.addEventListener('focusin', function () { hovering = true; stop(); });
+  root.addEventListener('focusout', function (e) {
+    if (!root.contains(e.relatedTarget)) { hovering = false; start(); }
+  });
+  root.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); show(index - 1); start(); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); show(index + 1); start(); }
+  });
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) stop();
+    else start();
+  });
+  show(0);
+  start();
+})();
+
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var nodes = document.querySelectorAll('.reveal');
+  if (reduce || !('IntersectionObserver' in window)) {
+    nodes.forEach(function (node) { node.classList.add('in'); });
+    return;
+  }
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('in');
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -8px 0px' });
+  nodes.forEach(function (node) { observer.observe(node); });
+})();
+
+/* 교회소식·대표 영상. data/board.json 을 읽고, 쇼츠를 뺀 뒤 분류마다 조회수 높은 몇 편만 그립니다.
+   HTML의 <!-- BOARD:START --> … <!-- BOARD:END --> 는 파일을 열었을 때의 기본 내용입니다. */
+(function () {
+  var grid = document.getElementById('vgrid');
+  if (!grid) return;
+  var current = 'all';
+  var PER = { sermon: 3, praise: 2, prayer: 2, spoon: 2 };
+  var ORDER = ['sermon', 'praise', 'prayer', 'spoon'];
+
+  function esc(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+    });
+  }
+  function isShort(item) {
+    if (!item) return true;
+    if (item.is_short) return true;
+    var url = String(item.url || '');
+    if (url.indexOf('/shorts/') !== -1) return true;
+    var kind = String(item.kind || '');
+    if (kind.indexOf('쇼츠') !== -1) return true;
+    var raw = String(item.raw_title || '');
+    if (/#shorts/i.test(raw)) return true;
+    return false;
+  }
+  function byViews(a, b) {
+    var diff = (Number(b.views) || 0) - (Number(a.views) || 0);
+    if (diff) return diff;
+    return String(b.published_kst || b.date_kst || '').localeCompare(String(a.published_kst || a.date_kst || ''));
+  }
+  function curate(items) {
+    var list = (items || []).filter(function (item) { return !isShort(item); });
+    var pinned = list.filter(function (item) { return item.pinned === true; });
+    var pool = pinned.length ? pinned : list;
+    var featured = null;
+    pool.forEach(function (item) {
+      if (item.category !== 'sermon') return;
+      if (!featured || byViews(featured, item) > 0) featured = item;
+    });
+    var groups = {};
+    pool.forEach(function (item) {
+      if (featured && item.id === featured.id) return;
+      var key = item.category || 'sermon';
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(item);
+    });
+    var chosen = [];
+    ORDER.forEach(function (key) {
+      var rows = (groups[key] || []).slice().sort(byViews);
+      var limit = PER[key] || 2;
+      if (key === 'sermon' && featured) limit = Math.max(0, limit - 1);
+      chosen = chosen.concat(rows.slice(0, limit));
+    });
+    return { featured: featured, items: chosen };
+  }
+  function card(item, labels) {
+    var meta = [item.kind, item.scripture ? '본문 ' + item.scripture : '', item.preacher].filter(Boolean).join(' · ');
+    return '<article class="vcard" data-cat="' + esc(item.category) + '" data-id="' + esc(item.id) + '"><a href="' + esc(item.url) + '" target="_blank" rel="noopener">' +
+      '<span class="thumb' + (item.is_short ? ' short' : '') + '"><img loading="lazy" src="' + esc(item.thumb) + '" alt="" width="480" height="360"><i class="play" aria-hidden="true"></i></span>' +
+      '<span class="vbody"><span class="vcat c-' + esc(item.category) + '">' + esc(labels[item.category] || '') + '</span><b class="vtitle">' + esc(item.title) + '</b>' +
+      (meta ? '<span class="vmeta">' + esc(meta) + '</span>' : '') +
+      '<span class="vdate">' + esc(String(item.date_kst || '').replace(/-/g, '.')) + '</span>' +
+      (item.summary ? '<span class="vsum">' + esc(item.summary) + '</span>' : '') +
+      '</span></a></article>';
+  }
+  function apply() {
+    var any = false;
+    grid.querySelectorAll('.vcard').forEach(function (cardEl) {
+      var show = current === 'all' || cardEl.getAttribute('data-cat') === current;
+      cardEl.hidden = !show;
+      if (show) any = true;
+    });
+    var empty = document.getElementById('vempty');
+    if (empty) empty.hidden = any;
+  }
+  function setFeatured(item) {
+    if (!item || !item.id) return;
+    var frame = document.getElementById('feature-frame');
+    var link = document.getElementById('feature-link');
+    var title = document.getElementById('feature-title');
+    var meta = document.getElementById('feature-meta');
+    var bits = [item.scripture ? '본문 ' + item.scripture : '', item.preacher || '', item.date_kst ? String(item.date_kst).replace(/-/g, '.') : ''].filter(Boolean);
+    if (frame && String(frame.getAttribute('src') || '').indexOf(item.id) === -1) {
+      frame.src = 'https://www.youtube-nocookie.com/embed/' + item.id + '?rel=0';
+    }
+    if (frame) frame.title = '대표 설교: ' + item.title + (bits.length ? ', ' + bits.join(', ') : '');
+    if (link) link.href = item.url || ('https://www.youtube.com/watch?v=' + item.id);
+    if (title) title.textContent = item.title || '';
+    if (meta) meta.textContent = bits.length ? ' · ' + bits.join(' · ') : '';
+  }
+
+  document.querySelectorAll('.fbtn').forEach(function (button) {
+    button.addEventListener('click', function () {
+      current = button.getAttribute('data-f') || 'all';
+      document.querySelectorAll('.fbtn').forEach(function (other) {
+        var on = other === button;
+        other.classList.toggle('on', on);
+        other.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      apply();
+    });
+  });
+
+  if (!window.fetch || location.protocol === 'file:') return;
+  fetch('data/board.json', { cache: 'no-cache' }).then(function (res) {
+    if (!res.ok) throw new Error('board');
+    return res.json();
+  }).then(function (data) {
+    if (!data || !data.items || !data.items.length) return;
+    var labels = {};
+    (data.categories || []).forEach(function (cat) { labels[cat.id] = cat.label; });
+    var picked = curate(data.items);
+    setFeatured(picked.featured);
+    if (picked.items.length) grid.innerHTML = picked.items.map(function (item) { return card(item, labels); }).join('');
+    if (data.notices && data.notices.length) {
+      var notices = document.getElementById('notices');
+      if (notices) {
+        notices.innerHTML = data.notices.map(function (notice) {
+          var foot = [notice.date ? String(notice.date).replace(/-/g, '.') : '', notice.link ? '<a href="' + esc(notice.link) + '" target="_blank" rel="noopener">자세히 보기</a>' : ''].filter(Boolean).join(' · ');
+          return '<article class="notice"><span class="ntag">' + esc(notice.tag || '소식') + '</span><h3>' + esc(notice.title) + '</h3><p>' + esc(notice.body) + '</p>' + (foot ? '<p class="ndate">' + foot + '</p>' : '') + '</article>';
+        }).join('');
+      }
+    }
+    var updated = document.getElementById('board-upd');
+    if (updated && data.updated_kst) updated.textContent = '(목록 갱신: ' + String(data.updated_kst).slice(0, 10).replace(/-/g, '.') + ')';
     apply();
-  }).catch(function(){});
+  }).catch(function () {});
 })();
