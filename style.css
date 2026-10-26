@@ -638,3 +638,32 @@ a.hub-card:hover { border-color: var(--gold); }
   .toast { transition: none; }
   .hero-dots button::after { transition: none; }
 }
+
+/* 말씀 노트 — 글 카드만. 사진 갤러리는 실제 사진이 생기면 별도 섹션(#gallery)으로 추가 */
+.note-list { display: grid; gap: 16px; }
+.note-card {
+  padding: 24px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--gold);
+  border-radius: 8px;
+}
+.note-meta { margin: 0 0 8px; font-size: 18px; font-weight: 700; color: #7A6232; }
+.note-date { font-variant-numeric: tabular-nums; }
+.note-ref { margin: 0 0 16px; font-size: 18px; font-weight: 700; color: var(--navy); }
+.note-ref .lb { margin-right: 8px; }
+.note-ref .muted { font-weight: 600; }
+.note-points { margin: 0 0 24px; padding-left: 24px; }
+.note-points li { margin: 0 0 16px; padding-left: 4px; font-size: 18px; line-height: 1.7; color: var(--muted); }
+.note-points li::marker { font-weight: 800; color: var(--gold); }
+.note-points b { display: block; font-size: 20px; line-height: 1.45; color: var(--navy); }
+.note-points q { display: block; margin-top: 4px; quotes: "“" "”"; }
+.note-links { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+.note-links .btn { flex: 1 1 100%; }
+.note-foot { margin: 16px 0 0; font-size: 18px; color: var(--soft); }
+.note-about { margin-top: 24px; }
+
+@media (min-width: 800px) {
+  .note-list { grid-template-columns: 1fr 1fr; gap: 24px; }
+  .note-links .btn { flex: 1 1 auto; }
+}
