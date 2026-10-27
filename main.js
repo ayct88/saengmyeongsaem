@@ -182,13 +182,13 @@ document.documentElement.classList.add('js');
   nodes.forEach(function (node) { observer.observe(node); });
 })();
 
-/* 교회소식·대표 영상. data/board.json 을 읽고, 쇼츠를 뺀 뒤 분류마다 조회수 높은 몇 편만 그립니다.
+/* 교회소식·대표 영상. data/board.json 을 읽고, 쇼츠를 뺀 뒤 분류마다 새 영상부터 몇 편만 그립니다.
    HTML의 <!-- BOARD:START --> … <!-- BOARD:END --> 는 파일을 열었을 때의 기본 내용입니다. */
 (function () {
   var grid = document.getElementById('vgrid');
   if (!grid) return;
   var current = 'all';
-  var PER = { sermon: 3, praise: 2, prayer: 2, spoon: 2 };
+  var PER = { sermon: 3, praise: 2, prayer: 2, spoon: 3 };
   var ORDER = ['sermon', 'praise', 'prayer', 'spoon'];
 
   function esc(value) {
@@ -208,8 +208,7 @@ document.documentElement.classList.add('js');
     return false;
   }
   function byViews(a, b) {
-    var diff = (Number(b.views) || 0) - (Number(a.views) || 0);
-    if (diff) return diff;
+    /* 최신순: 올라온 시각이 늦은 영상이 먼저 */
     return String(b.published_kst || b.date_kst || '').localeCompare(String(a.published_kst || a.date_kst || ''));
   }
   function curate(items) {
