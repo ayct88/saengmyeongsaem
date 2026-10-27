@@ -50,6 +50,13 @@ document.documentElement.classList.add('js');
     }
     document.body.removeChild(area);
   }
+  /* 네이버 지도: 기본은 모바일 장소 페이지, 데스크톱에서는 데스크톱 지도 주소로 교체 */
+  if (!/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)) {
+    document.querySelectorAll('a[data-desktop-href]').forEach(function (a) {
+      var href = a.getAttribute('data-desktop-href');
+      if (href) a.setAttribute('href', href);
+    });
+  }
   document.querySelectorAll('.copy').forEach(function (button) {
     button.addEventListener('click', function () {
       var value = button.getAttribute('data-copy') || '';
